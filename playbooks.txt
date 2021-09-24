@@ -1,0 +1,78 @@
+--- # my first target playbook
+- hosts: demo
+  user: demo
+  become: yes
+  connection: ssh
+  gather_facts: yes
+  
+  ======================================
+  --- # handlers file
+- hosts: demo
+  user: demo
+  become: yes
+  connection: ssh
+
+  tasks:
+          - name: installing httpd
+            action: yum name=httpd state=present
+            notify: restart httpd task
+
+  handlers:
+          - name: restart httpd task
+            action: service name=httpd state=restarted
+			
+			=====================================================
+			
+			--- # playbook with task this time
+- hosts: demo
+  user: demo
+  become: yes
+  connection: ssh
+  tasks:
+          - name: installing tree
+            action: yum name=tree state=present
+===================================================
+
+--- # varibale playbook
+- hosts: demo
+  user: demo
+  become: yes
+  connection: ssh
+
+  vars:
+          pkgname: httpd
+  tasks:
+          - name: installing httpd
+            action: yum name='{{pkgname}}' state=present
+			
+			===========================================
+--- # condition playbook
+- hosts: demo
+  user: demo
+  become: yes
+  connection: ssh
+
+  tasks:
+          - name: install apache
+            command: apt-get -y install apache2
+            when: ansible_os_family == "Debian"
+          - name: install httpd
+            command: yum -y install httpd
+            when: ansible_os_family == "RedHat"
+=========================================
+
+--- # loops lab
+- hosts: demo
+  user: demo
+  become: yes
+  connection: ssh
+
+  tasks:
+          - name: add list of users in node1
+            user: name='{{item}}' state=present
+            with_items:
+                    - nisha
+                    - kiran
+                    - rao
+                    - mohini
+			
